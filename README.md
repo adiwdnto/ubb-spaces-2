@@ -10,10 +10,17 @@ Prototipe aplikasi peminjaman ruang kegiatan Universitas Bangka Belitung. Fronte
 ## Siapkan database
 
 1. Buat database MySQL `db.ubb_space`.
-2. Impor dump awal yang disediakan (`database/000_base.sql`) ke database tersebut.
-3. Jalankan migrasi `database/001_mvp.sql` setelah dump awal berhasil diimpor.
+2. Impor `database/ubb_space_final.sql` satu kali ke database tersebut. Dump ini sudah berisi skema final, data ruang, dan akun demo; tidak perlu menjalankan file migrasi terpisah.
 
-Migrasi menambahkan hash kata sandi dan status verifikasi, rincian kegiatan, riwayat persetujuan, indeks pencarian spasial/jadwal, dan validasi rentang waktu. Data pengguna lama tetap dapat dibaca, tetapi akun harus memiliki kata sandi yang diatur sebelum bisa login.
+Semua akun demo menggunakan password `DemoUBB2026!`:
+
+| Akun | NIM/NIP | Peran |
+| --- | --- | --- |
+| Budi Pratama (BEM UBB) | `1012111001` | ORMAWA |
+| Siti Rahmawati | `1012111045` | STUDENT |
+| Admin Kemahasiswaan UBB | `198501012015041001` | ADMIN |
+
+Kredensial tersebut hanya untuk demo lokal. Ganti atau hapus akun/password demo sebelum database digunakan di lingkungan lain.
 
 ## Jalankan backend
 
@@ -25,10 +32,15 @@ Copy-Item .env.example .env
 npm install
 ```
 
-Isi konfigurasi MySQL dan ganti `JWT_SECRET` di `backend/.env` dengan secret acak minimal 32 karakter. Untuk menyiapkan akun admin kampus pertama, isi `ADMIN_NIM`, `ADMIN_NAME`, dan `ADMIN_PASSWORD`, lalu jalankan:
+Isi konfigurasi MySQL dan ganti `JWT_SECRET` di `backend/.env` dengan secret acak minimal 32 karakter. Jika memakai dump final, akun admin demo sudah tersedia dan seeder tidak perlu dijalankan. Untuk instalasi non-demo atau membuat akun admin berbeda, isi `ADMIN_NIM`, `ADMIN_NAME`, dan `ADMIN_PASSWORD` di `backend/.env`, lalu jalankan:
 
 ```powershell
 npm run seed:admin
+```
+
+Jalankan backend:
+
+```powershell
 npm run dev
 ```
 
@@ -49,7 +61,7 @@ Buka URL yang ditampilkan Vite (default `http://localhost:5173`). Untuk endpoint
 ## Kebijakan prototipe
 
 - Mahasiswa dan ormawa dapat mendaftar dan langsung menggunakan akun setelah pendaftaran.
-- Staff fakultas (`MANAGEMENT`) dan staff admin kampus (`ADMIN`) harus diverifikasi admin kampus. Akun admin pertama disiapkan melalui `npm run seed:admin`.
+- Staff fakultas (`MANAGEMENT`) harus diverifikasi admin kampus. Dump demo menyediakan akun admin; untuk instalasi non-demo, siapkan akun admin pertama melalui `npm run seed:admin`.
 - Staff admin kampus memverifikasi akun staff dan menyetujui atau menolak seluruh permohonan. Staff fakultas dapat mengakses katalog dan mengajukan peminjaman.
 - Slot dengan permohonan `PENDING` atau peminjaman `APPROVED` tidak ditampilkan sebagai tersedia; API memeriksa bentrok kembali di dalam transaksi.
 - Peminjam dapat membatalkan permohonan yang masih `PENDING`.
